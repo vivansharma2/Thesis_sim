@@ -1,5 +1,5 @@
 % This function computes the utility for the case without DTC depending on the vector x of input taxes, the initial values for the productivity of the clean and dirty sector and the inital environmental quality.
-function U = mysimopttaxnew2noDTC(x, Ac0, Ad0, Aa0, S0)
+function U = optidtc(x, Ac0, Ad0, Aa0, S0)
 global rho sigma psi phi alpha gamma eta_d eta_c eta_a qsi epsilon delta numsim psi1 psi2 
 %%% Setting vectors' sizes
 A_c = zeros(numsim,1);
@@ -25,13 +25,18 @@ xait = zeros(numsim,1);
 Y = zeros(numsim,1);
 C = zeros(numsim,1);
 S = zeros(numsim,1); 
-s_c = eta_c/(eta_c+eta_d+eta_a)*ones(numsim,1); % scientist allocations
-s_d = eta_d/(eta_c+eta_d+eta_a)*ones(numsim,1);
-s_a = (1 - s_c - s_d).*ones(numsim,1);
-tau_d = x(1:numsim);                    % first half = dirty input tax
-tau_a = x(numsim + 1 : 2 * numsim);     % second half = adaptive input tax 
+s_c = x(1:numsim); % scientist allocations
+s_d = x(numsim + 1 : 2 * numsim);
+s_a = x(2 * numsim + 1 : 3 * numsim);
+tau_d = 0.1 * ones(numsim,1);   % first half = dirty input tax
+tau_a = 0.1 * ones(numsim,1);  % second half = adaptive input tax 
+
 tempinc = zeros(numsim,1);
 Omega = zeros(numsim,1);
+share_Yc = zeros(numsim, 1);
+share_Yd = zeros(numsim, 1);
+share_Ya = zeros(numsim, 1);
+CES_den = zeros(numsim,1);
 
 % Constraints
 Yamax = zeros(numsim,1);
@@ -91,6 +96,14 @@ end
 % Final good production evolution
 Y(1) = (Yc(1)^((epsilon - 1) / epsilon) + Yd(1)^((epsilon - 1) / epsilon) + Ya(1)^((epsilon - 1) / epsilon))^(epsilon / (epsilon - 1));
 
+    % Share of production
+    CES_den(1) = Yc(1)^((epsilon - 1)/epsilon) + Yd(1)^((epsilon - 1)/epsilon) + Ya(1)^((epsilon - 1)/epsilon);
+    
+    % Shares
+    share_Yc(1) = Yc(1)^((epsilon - 1)/epsilon) / CES_den(1);
+    share_Yd(1) = Yd(1)^((epsilon - 1)/epsilon) / CES_den(1);
+    share_Ya(1) = Ya(1)^((epsilon - 1)/epsilon) / CES_den(1);
+    
 % Machine production evolution
 xcit(1) = (alpha / psi)^(alpha / (1 - alpha)) * Omega(1)^(1 / (1 - alpha)) * ...
      ((numerc(1))^(-1/ phi) / denomc(1)) * A_c(1)^(- phi);
@@ -167,6 +180,14 @@ Y(n) = (Yc(n)^((epsilon - 1) / epsilon) + ...
     Yd(n)^((epsilon - 1) / epsilon) + ...
     Ya(n)^((epsilon - 1) / epsilon))^(epsilon / (epsilon - 1));
 
+% Share of production
+    CES_den(n) = Yc(n)^((epsilon - 1)/epsilon) + Yd(n)^((epsilon - 1)/epsilon) + Ya(n)^((epsilon - 1)/epsilon);
+    
+% Shares
+share_Yc(n) = Yc(n)^((epsilon - 1)/epsilon) / CES_den(n);
+share_Yd(n) = Yd(n)^((epsilon - 1)/epsilon) / CES_den(n);
+share_Ya(n) = Ya(n)^((epsilon - 1)/epsilon) / CES_den(n);
+
 % Machine inputs
 xcit(n) = (alpha / psi)^(alpha / (1 - alpha)) * Omega(n)^(1 / (1 - alpha)) * ...
             ((numerc(n))^(-1/ phi) / denomc(n)) * A_c(n)^(- phi);
@@ -198,8 +219,7 @@ for j = 1:numsim
 
         % Robust check
         if utility_input > 1e-10 && isreal(utility_input)
-            Util(j) = -(1 / (1 - sigma)) * Teste3(j) * utility_input^(1 - sigma) ...
-                      - tax_penalty;
+            Util(j) = -(1 / (1 - sigma)) * Teste3(j) * utility_input^(1 - sigma);
         else
             Util(j) = -1e10;
         end

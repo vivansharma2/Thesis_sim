@@ -150,7 +150,7 @@ if delay>0
         zeros(delay,1); % stacked: [tau_d; tau_a]
     ]; 
     % comp stacks the allocation of scientists to the clean sector and the initial carbon tax
-    RespC=mysimenvtaxnew3(comp, Ac0, Ad0, Aa0, S0); % compute the relevant parameters for the economy
+    RespC=noidtc(comp, Ac0, Ad0, Aa0, S0); % compute the relevant parameters for the economy
     StockAc=RespC.Ac;
     StockAd=RespC.Ad;
     StockAa=RespC.Aa;
@@ -192,7 +192,7 @@ numsim=numsimleft;
 
 %==== Run ====%
 if mode == 0
-    [x,fval,exitflag] = fmincon(@(x)mysimopttaxnew2noDTC(x, Ac0, Ad0, Aa0, S0),x0,[],[],[],[],lb,ub,[],options); % no IDTC
+    [x,fval,exitflag] = fmincon(@(x)optnoidtc(x, Ac0, Ad0, Aa0, S0),x0,[],[],[],[],lb,ub,[],options); % no IDTC
     x = [ ...
         eta_c/(eta_c+eta_d+eta_a)*ones(numsim,1);   % clean scientist share 
         eta_d/(eta_c+eta_d+eta_a)*ones(numsim,1);   % dirty scientist share 
@@ -201,7 +201,7 @@ if mode == 0
         0.1*ones(numsim,1); % stacked: [tau_d; tau_a]
     ]; % x now combines the (constant) allocation of scientists with the tax rate
 else 
-    [x,fval,exitflag] = fmincon(@(x)mysimopttaxnew4(x, Ac0, Ad0, Aa0, S0), ...
+    [x,fval,exitflag] = fmincon(@(x)optidtc(x, Ac0, Ad0, Aa0, S0), ...
                             x0, [], [], Aeq, beq, lb, ub, [], options);
 end 
 
@@ -212,7 +212,7 @@ end
 %==== Stack results ====%
 Util=utcomp-1/(1+rho)^delay*fval;
 if mode == 0
-    Resp = mysimenvtaxnew3(x, Ac0, Ad0, Aa0, S0);
+    Resp = noidtc(x, Ac0, Ad0, Aa0, S0);
     
     % Combine past and simulated values for plotting or saving
     S_c_all = [StockS_c; Resp.S_c];
@@ -236,7 +236,7 @@ if mode == 0
     Ss = [StockS; Resp.S];            % environmental quality
 
 else 
-    Resp = mysimenvtaxnew4(x, Ac0, Ad0, Aa0, S0);
+    Resp = idtc(x, Ac0, Ad0, Aa0, S0);
     
     % Combine past and simulated values for plotting or saving
     S_c_all = [StockS_c; Resp.S_c];    % share of scientists in clean

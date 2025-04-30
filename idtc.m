@@ -1,4 +1,4 @@
-function Resp = mysimenvtaxnew4(x, Ac0, Ad0, Aa0, S0)
+function Resp = idtc(x, Ac0, Ad0, Aa0, S0)
 global rho sigma psi phi alpha gamma eta_d eta_c eta_a qsi epsilon delta numsim psi1 psi2 
 
 s_c = x(1:numsim);
