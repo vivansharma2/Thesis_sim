@@ -56,7 +56,7 @@ Aa0 = (Ac0+Ad0)/4; % initial assumption, change as you wish
 %********************************************************************
 % 2. OPTIONS
 %********************************************************************
-mode = 0; % 0 for no IDTC, 1 for IDTC
+mode = 1; % 0 for no IDTC, 1 for IDTC
 delay = 30 * mode;  % delay must be 0 if mode == 0
 
 %==== Initializing delay stock vectors ====%
