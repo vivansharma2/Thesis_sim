@@ -1,4 +1,9 @@
+%********************************************************************
+% 1. WITH IDTC
+%********************************************************************
 function Resp = idtc(x, Ac0, Ad0, Aa0, S0)
+
+%==== Initializing vectors ====%
 global rho sigma psi phi alpha gamma eta_d eta_c eta_a qsi epsilon delta numsim psi1 psi2 
 
 s_c = x(1:numsim);
@@ -6,8 +11,7 @@ s_d = x(numsim+1 : 2*numsim);
 s_a = x(2*numsim+1 : 3*numsim);
 tau_d = 0.2 * ones(numsim,1);
 tau_a = 0.1 * ones(numsim,1);
- 
-%%% Setting vectors' sizes
+
 A_c = zeros(numsim,1);
 A_d = zeros(numsim,1);
 A_a = zeros(numsim,1);
@@ -47,12 +51,12 @@ CES_den = zeros(numsim,1);
 pi_cd = zeros(numsim, 1);
 pi_ca = zeros(numsim, 1);
 
-% Constraints
+%==== Constraints ====%
 Yamax = zeros(numsim,1);
 Xamax = zeros(numsim,1);
 
-%%% Initial values
-% Environmental variables
+%==== Period 1 values ====%
+% Environment
 S(1) = S0;   
 tempinc(1) = max(0, 3 * log2(max((1120 - S(1)), 1e-10) / 280));
 Omega(1) = 1- (psi1*tempinc(1) + psi2*(tempinc(1)^2));
@@ -63,7 +67,6 @@ A_d(1)=(1+gamma*eta_d*(s_d(1)))*Ad0;
 
 icl(1) = A_c(1) >= A_d(1);
 idr(1) = A_d(1) > A_c(1);
-
 A_a(1) = (1 + gamma * eta_a * s_a(1)) * Aa0;
 
 % Intermediate good production evolution
@@ -105,13 +108,13 @@ end
 % Final good production evolution
 Y(1) = (Yc(1)^((epsilon - 1) / epsilon) + Yd(1)^((epsilon - 1) / epsilon) + Ya(1)^((epsilon - 1) / epsilon))^(epsilon / (epsilon - 1));
 
-    % Share of production
-    CES_den(1) = Yc(1)^((epsilon - 1)/epsilon) + Yd(1)^((epsilon - 1)/epsilon) + Ya(1)^((epsilon - 1)/epsilon);
+% Share of production
+CES_den(1) = Yc(1)^((epsilon - 1)/epsilon) + Yd(1)^((epsilon - 1)/epsilon) + Ya(1)^((epsilon - 1)/epsilon);
     
-    % Shares
-    share_Yc(1) = Yc(1)^((epsilon - 1)/epsilon) / CES_den(1);
-    share_Yd(1) = Yd(1)^((epsilon - 1)/epsilon) / CES_den(1);
-    share_Ya(1) = Ya(1)^((epsilon - 1)/epsilon) / CES_den(1);
+% Shares
+share_Yc(1) = Yc(1)^((epsilon - 1)/epsilon) / CES_den(1);
+share_Yd(1) = Yd(1)^((epsilon - 1)/epsilon) / CES_den(1);
+share_Ya(1) = Ya(1)^((epsilon - 1)/epsilon) / CES_den(1);
 
 % Machine production evolution
 xcit(1) = (alpha / psi)^(alpha / (1 - alpha)) * Omega(1)^(1 / (1 - alpha)) * ...
@@ -129,9 +132,9 @@ end
 % Consumption evolution
 C(1) = Y(1) - psi*(xcit(1) + xdit(1) + xait(1));
 
-%%%%%%%%%%%%%%%%
-%%% Simulations
-%%%%%%%%%%%%%%%%
+%********************************************************************
+% 2. SIMULATIONS
+%********************************************************************
 
 for n = 2:numsim
 % Update productivity
@@ -150,8 +153,13 @@ S(n) = min(max(0.00000000000000001,-qsi * (Yd(n-1) + idr(n) * Ya(n-1)) + (1 + de
 
 % Temperature and damage
 tempinc(n) = 3 * log2(max(1e-6, (1120 - S(n)) / 280));
-Omega(n) = max(1e-6, 1 - (psi1 * tempinc(n) + psi2 * tempinc(n)^2));
-Omega(n) = max(1e-6, Omega(n));
+if Omega(n-1) == 1
+    Omega(n) = 1;
+else
+    Omega(n) = max(1e-6, 1 - (psi1 * tempinc(n) + psi2 * tempinc(n)^2));
+    Omega(n) = min(1, Omega(n));
+end
+
 
 % Intermediate outputs
 numerc(n) = (A_c(n)^(-phi) + (1 + tau_d(n))^(1 - epsilon) * A_d(n)^(-phi) + ...
@@ -225,12 +233,14 @@ for j=1:numsim
     Util(j)=-(1/(1-sigma))*Teste3(j)*(phiS(S(j))*C(j))^(1-sigma);
 end
 
-% Computing optimal adaptive subsidy
+%********************************************************************
+% 1. OPTIMAL ADAPTIVE SUSBSIDY
+%********************************************************************
 % ======= Period 1 =======
 if s_c(1) == 1 || s_c(1) == 0
     q(1)        = 0;
 else
-    q_lb(1) = Omega(1) * ( ...
+    q_lb(1) = (Omega(1))^2 * ( ...
         ( (1 + tau_d(1))^epsilon * (eta_c / eta_d) * ...
         ((1 + gamma * eta_c * s_c(1)) / (1 + gamma * eta_d * s_d(1)))^(-phi - 1) * ...
         (Ac0 / Ad0)^(-phi) )^(-1)) - 1 ;
@@ -250,7 +260,7 @@ for t = 2:numsim
     if s_c(t) == 1 || s_c(t) == 0
         q(t) = 0;
     else
-        q_lb(t) = Omega(t) * ( ...
+        q_lb(t) = (Omega(t))^2 * ( ...
             ( (1 + tau_d(t))^(-epsilon) * (eta_d / eta_c) * ...
             ((1 + gamma * eta_d * s_d(t)) / (1 + gamma * eta_c * s_c(t)))^(-phi - 1) * ...
             (A_d(t-1) / A_c(t-1))^(-phi) )) - 1 ;

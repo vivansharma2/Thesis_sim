@@ -56,8 +56,8 @@ Aa0 = (Ac0+Ad0)/4; % initial assumption, change as you wish
 %********************************************************************
 % 2. OPTIONS
 %********************************************************************
-mode = 1; % 0 for no IDTC, 1 for IDTC
-delay = 35 * mode;  % delay must be 0 if mode == 0
+mode = 0; % 0 for no IDTC, 1 for IDTC
+delay = 25 * mode;  % delay must be 0 if mode == 0
 
 %==== Initializing delay stock vectors ====%
 StockAc = [];
@@ -313,7 +313,7 @@ else
     % 1. Temperature/Omega
     subplot(2,2,1)
     plot(5*(1:numsimc), Omega(1:numsimc), 'r', 'LineWidth', 1.5);
-    xlabel('Period (Years)')
+    xlabel('Year')
     ylabel('Remaining Output')
     legend('\Omega')
     title('Damage Function')
@@ -324,7 +324,7 @@ else
     plot(5*(1:numsimc), share_Yc(1:numsimc), 'b', 'LineWidth', 1.5); hold on;
     plot(5*(1:numsimc), share_Yd(1:numsimc), 'r', 'LineWidth', 1.5);
     plot(5*(1:numsimc), share_Ya(1:numsimc), 'g', 'LineWidth', 1.5);
-    xlabel('Period (Years)')
+    xlabel('Year')
     ylabel('Output')
     legend('Y_c', 'Y_d', 'Y_a')
     title('Share of Sector Output')
@@ -335,7 +335,7 @@ else
     plot(5*(1:numsimc), S_c_all(1:numsimc), 'b', 'LineWidth', 1.5); hold on;
     plot(5*(1:numsimc), S_d_all(1:numsimc), 'r', 'LineWidth', 1.5);
     plot(5*(1:numsimc), S_a_all(1:numsimc), 'g', 'LineWidth', 1.5);
-    xlabel('Period (Years)')
+    xlabel('Year')
     ylabel('Scientist Share')
     legend('S_c', 'S_d', 'S_a')
     title('Scientist Allocation')
@@ -344,7 +344,48 @@ else
     % 4. Subsidy Q
     subplot(2,2,4)
     plot(5*(1:numsimc), Qq(1:numsimc), 'm', 'LineWidth', 1.5); 
-    xlabel('Period (Years)')
+figure;
+
+% 1. Temperature/Omega
+subplot(2,2,1)
+plot(5*(1:numsimc), Omega(1:numsimc), 'r', 'LineWidth', 1.5);
+xlabel('Year')
+ylabel('Remaining Output')
+legend('\Omega')
+title('Damage Function')
+grid on
+
+% 2. Production Shares
+subplot(2,2,2)
+plot(5*(1:numsimc), share_Yc(1:numsimc), 'b', 'LineWidth', 1.5); hold on;
+plot(5*(1:numsimc), share_Yd(1:numsimc), 'r', 'LineWidth', 1.5);
+plot(5*(1:numsimc), share_Ya(1:numsimc), 'g', 'LineWidth', 1.5);
+xlabel('Year')
+ylabel('Output')
+legend('Y_c', 'Y_d', 'Y_a')
+title('Share of Sector Output')
+grid on
+
+% 3. Scientist Shares
+subplot(2,2,3)
+plot(5*(1:numsimc), S_c_all(1:numsimc), 'b', 'LineWidth', 1.5); hold on;
+plot(5*(1:numsimc), S_d_all(1:numsimc), 'r', 'LineWidth', 1.5);
+plot(5*(1:numsimc), S_a_all(1:numsimc), 'g', 'LineWidth', 1.5);
+xlabel('Year')
+ylabel('Scientist Share')
+legend('S_c', 'S_d', 'S_a')
+title('Scientist Allocation')
+grid on
+
+% 4. Subsidy Q
+subplot(2,2,4)
+plot(5*(1:numsimc), Qq(1:numsimc), 'm', 'LineWidth', 1.5); 
+xlabel('Year')
+ylabel('Subsidy to Clean')
+title('Subsidy Path')
+legend('Q')
+grid on
+
     ylabel('Subsidy to Clean')
     title('Subsidy Path')
     legend('Q')

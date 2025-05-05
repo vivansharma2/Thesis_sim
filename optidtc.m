@@ -1,7 +1,11 @@
-% This function computes the utility for the case without DTC depending on the vector x of input taxes, the initial values for the productivity of the clean and dirty sector and the inital environmental quality.
+%********************************************************************
+% 1. IDTC OPTIMIZATION
+%********************************************************************
 function U = optidtc(x, Ac0, Ad0, Aa0, S0)
+
+%==== Initializing vectors ====%
 global rho sigma psi phi alpha gamma eta_d eta_c eta_a qsi epsilon delta numsim psi1 psi2 
-%%% Setting vectors' sizes
+
 A_c = zeros(numsim,1);
 A_d = zeros(numsim,1);
 A_a = zeros(numsim,1);
@@ -96,13 +100,13 @@ end
 % Final good production evolution
 Y(1) = (Yc(1)^((epsilon - 1) / epsilon) + Yd(1)^((epsilon - 1) / epsilon) + Ya(1)^((epsilon - 1) / epsilon))^(epsilon / (epsilon - 1));
 
-    % Share of production
-    CES_den(1) = Yc(1)^((epsilon - 1)/epsilon) + Yd(1)^((epsilon - 1)/epsilon) + Ya(1)^((epsilon - 1)/epsilon);
+% Share of production
+CES_den(1) = Yc(1)^((epsilon - 1)/epsilon) + Yd(1)^((epsilon - 1)/epsilon) + Ya(1)^((epsilon - 1)/epsilon);
     
-    % Shares
-    share_Yc(1) = Yc(1)^((epsilon - 1)/epsilon) / CES_den(1);
-    share_Yd(1) = Yd(1)^((epsilon - 1)/epsilon) / CES_den(1);
-    share_Ya(1) = Ya(1)^((epsilon - 1)/epsilon) / CES_den(1);
+% Shares
+share_Yc(1) = Yc(1)^((epsilon - 1)/epsilon) / CES_den(1);
+share_Yd(1) = Yd(1)^((epsilon - 1)/epsilon) / CES_den(1);
+share_Ya(1) = Ya(1)^((epsilon - 1)/epsilon) / CES_den(1);
     
 % Machine production evolution
 xcit(1) = (alpha / psi)^(alpha / (1 - alpha)) * Omega(1)^(1 / (1 - alpha)) * ...
@@ -120,9 +124,9 @@ end
 % Consumption evolution
 C(1) = Y(1) - psi*(xcit(1) + xdit(1) + xait(1));
 
-%%%%%%%%%%%%%%%%
-%%% Simulations
-%%%%%%%%%%%%%%%%
+%********************************************************************
+% 2. SIMULATIONS
+%********************************************************************
 
 for n = 2:numsim
 
@@ -181,7 +185,7 @@ Y(n) = (Yc(n)^((epsilon - 1) / epsilon) + ...
     Ya(n)^((epsilon - 1) / epsilon))^(epsilon / (epsilon - 1));
 
 % Share of production
-    CES_den(n) = Yc(n)^((epsilon - 1)/epsilon) + Yd(n)^((epsilon - 1)/epsilon) + Ya(n)^((epsilon - 1)/epsilon);
+CES_den(n) = Yc(n)^((epsilon - 1)/epsilon) + Yd(n)^((epsilon - 1)/epsilon) + Ya(n)^((epsilon - 1)/epsilon);
     
 % Shares
 share_Yc(n) = Yc(n)^((epsilon - 1)/epsilon) / CES_den(n);

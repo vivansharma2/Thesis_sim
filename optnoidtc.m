@@ -1,7 +1,11 @@
-% This function computes the utility for the case without DTC depending on the vector x of input taxes, the initial values for the productivity of the clean and dirty sector and the inital environmental quality.
+%********************************************************************
+% 1. OPTIMIZATIONS WITHOUT IDTC
+%********************************************************************
 function U = optnoidtc(x, Ac0, Ad0, Aa0, S0)
+
+%==== Initializing vectors ====%
 global rho sigma psi phi alpha gamma eta_d eta_c eta_a qsi epsilon delta numsim psi1 psi2 
-%%% Setting vectors' sizes
+
 A_c = zeros(numsim,1);
 A_d = zeros(numsim,1);
 A_a = zeros(numsim,1);
@@ -107,9 +111,9 @@ end
 % Consumption evolution
 C(1) = Y(1) - psi*(xcit(1) + xdit(1) + xait(1));
 
-%%%%%%%%%%%%%%%%
-%%% Simulations
-%%%%%%%%%%%%%%%%
+%********************************************************************
+% 2. SIMULATIONS
+%********************************************************************
 
 for n = 2:numsim
 
